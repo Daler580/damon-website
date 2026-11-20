@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+.Trash/
+
+# Editor and local session data
+.vscode/
+.vscode-shared/
+.copilot/
+.codex/
+
+# Shell and SSH private data
+.zsh_history
+.zsh_sessions/
+.ssh/
+
+# Private certificates and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.ovpn
+
+# Logs and local databases
+*.log
+*.sqlite
+*.sqlite-*
+
+# macOS personal/system folders
+Applications/
+Desktop/
+Documents/
+Downloads/
+Library/
+Movies/
+Music/
+Pictures/
+Public/
+Templates/
+VirtualBox VMs/

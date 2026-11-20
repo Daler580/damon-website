@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05090D">
+<title>DAMON — Payments</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.neon-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.neon-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(85, 245, 229, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(85, 245, 229, 0.018) 1px, transparent 1px),
+    linear-gradient(115deg, transparent 0 26%, rgba(85, 245, 229, 0.018) 26.1%, transparent 26.5%),
+    linear-gradient(24deg, transparent 0 72%, rgba(85, 245, 229, 0.012) 72.1%, transparent 72.4%);
+  background-size: 54px 54px, 54px 54px, auto, auto;
+}
+
+.neon-bg svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.34;
+  filter: drop-shadow(0 0 5px rgba(85, 245, 229, 0.20));
+}
+
+.neon-bg path {
+  fill: none;
+  stroke: #55F5E5;
+  stroke-width: 1;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+
+.fracture {
+  animation: breathe 8s ease-in-out infinite alternate;
+}
+
+.fracture:nth-child(even) {
+  animation-delay: -4s;
+}
+
+@keyframes breathe {
+  0% { opacity: 0.28; }
+  100% { opacity: 0.72; }
+}
+
+@property --frame-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(33, 110, 104, 0.10), transparent 24%),
+    radial-gradient(circle at 82% 78%, rgba(42, 126, 115, 0.08), transparent 26%),
+    #05090D;
+  color: #E8FFFF;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 24px 32px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.08) 0 1px, transparent 1px 4px);
+  mix-blend-mode: multiply;
+}
+
+.frame-border {
+  position: fixed;
+  inset: 12px;
+  z-index: 21;
+  pointer-events: none;
+  padding: 1px;
+  --frame-angle: 0deg;
+  background: conic-gradient(from var(--frame-angle),
+    #55B8A5,
+    #55F5E5,
+    #7FFFD4,
+    #76B7FF,
+    #A78BFA,
+    #55B8A5);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.68;
+  filter: drop-shadow(0 0 3px rgba(85, 245, 229, 0.16));
+  animation: frame-gradient 18s linear infinite;
+}
+
+@keyframes frame-gradient {
+  to { --frame-angle: 360deg; }
+}
+
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+}
+
+.logo {
+  color: #55F5E5;
+  font-size: 34px;
+  letter-spacing: 5px;
+  font-weight: 800;
+  text-shadow: 0 0 14px rgba(85, 245, 229, 0.24);
+}
+
+.subtitle {
+  color: #66817F;
+  font-size: 10px;
+  letter-spacing: 3px;
+  margin-top: 9px;
+}
+
+.security-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  color: #526966;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+}
+
+.security-status b {
+  color: #55F5E5;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(85, 245, 229, 0.28);
+}
+
+.line {
+  height: 1px;
+  background: #18322F;
+  margin: 24px 0 35px;
+}
+
+h1 {
+  position: relative;
+  font-family: Arial, sans-serif;
+  font-size: 35px;
+  margin-bottom: 12px;
+}
+
+h1::before {
+  content: "TARGET_";
+  display: block;
+  margin-bottom: 5px;
+  color: #55F5E5;
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  opacity: 0.72;
+}
+
+.description {
+  color: #819492;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* PAYMENT CARDS */
+
+.card {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  padding: 21px;
+  margin-bottom: 13px;
+  cursor: pointer;
+  transition: .25s;
+  background: #193A36;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  min-height: 112px;
+  padding-left: 58px;
+  clip-path: polygon(18px 0, calc(100% - 34px) 0, calc(100% - 34px) 8px, 100% 8px, 100% calc(100% - 22px), calc(100% - 22px) 100%, 8px 100%, 0 calc(100% - 8px), 0 18px);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(85, 245, 229, 0.055) 1px, transparent 1px),
+    #091110;
+  background-size: 42px 100%, auto;
+  clip-path: polygon(19px 0, calc(100% - 33px) 0, calc(100% - 33px) 8px, 100% 8px, 100% calc(100% - 21px), calc(100% - 21px) 100%, 7px 100%, 0 calc(100% - 7px), 0 19px);
+}
+
+.card::after {
+  content: attr(data-node);
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 1px solid #55F5E5;
+  color: #55F5E5;
+  font-family: monospace;
+  font-size: 9px;
+  line-height: 1;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card:hover {
+  background: #55F5E5;
+  transform: translateY(-3px);
+  filter: drop-shadow(0 10px 18px rgba(85, 245, 229, 0.08));
+}
+
+.card:hover::before {
+  background: linear-gradient(135deg, rgba(11, 29, 27, 0.98), rgba(7, 17, 16, 1));
+}
+
+.card:focus-visible {
+  outline: 2px solid #55F5E5;
+  outline-offset: 4px;
+}
+
+.card--uzum {
+  --accent: #55F5E5;
+  background: #27645F;
+  clip-path: polygon(18px 0, calc(100% - 34px) 0, calc(100% - 34px) 8px, 100% 8px, 100% calc(100% - 22px), calc(100% - 22px) 100%, 8px 100%, 0 calc(100% - 8px), 0 18px);
+}
+
+.card--uzum::before {
+  background:
+    linear-gradient(90deg, transparent 0 72px, rgba(85, 245, 229, 0.08) 72px 73px, transparent 73px),
+    repeating-linear-gradient(90deg, transparent 0 41px, rgba(85, 245, 229, 0.04) 41px 42px),
+    #091110;
+}
+
+.card--uzum::after {
+  border-radius: 50%;
+  box-shadow: 0 0 14px rgba(85, 245, 229, 0.18);
+}
+
+.card--visa {
+  --accent: #75D9FF;
+  background: #2A5265;
+  clip-path: polygon(26px 0, 100% 0, 100% 74px, calc(100% - 12px) 74px, calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 26px);
+  transition-duration: 320ms;
+}
+
+.card--visa::before {
+  clip-path: polygon(27px 0, 100% 0, 100% 75px, calc(100% - 11px) 75px, calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 27px);
+  background:
+    linear-gradient(135deg, transparent 0 65%, rgba(117, 217, 255, 0.07) 65.4%, transparent 66%),
+    linear-gradient(90deg, rgba(117, 217, 255, 0.06) 1px, transparent 1px),
+    #091110;
+  background-size: auto, 38px 100%, auto;
+}
+
+.card--visa::after {
+  transform: translateY(-50%);
+  border: 0;
+  background: rgba(117, 217, 255, 0.08);
+  color: #75D9FF;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  box-shadow: none;
+  text-shadow: 0 0 8px rgba(117, 217, 255, 0.5);
+}
+
+.card--visa .card-name,
+.card--visa .card-info,
+.card--visa .number {
+  transform: translateX(2px);
+}
+
+.card--uzcard {
+  --accent: #9AF2BC;
+  background: #315D4E;
+  clip-path: polygon(0 14px, 14px 14px, 14px 0, calc(100% - 42px) 0, calc(100% - 42px) 8px, calc(100% - 18px) 8px, calc(100% - 18px) 16px, 100% 16px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 18px calc(100% - 14px), 0 calc(100% - 14px));
+}
+
+.card--uzcard::before {
+  clip-path: polygon(0 15px, 15px 15px, 15px 1px, calc(100% - 41px) 1px, calc(100% - 41px) 9px, calc(100% - 17px) 9px, calc(100% - 17px) 17px, 100% 17px, 100% calc(100% - 17px), calc(100% - 17px) 100%, 17px 100%, 17px calc(100% - 13px), 0 calc(100% - 13px));
+  background:
+    repeating-linear-gradient(0deg, transparent 0 21px, rgba(154, 242, 188, 0.04) 21px 22px),
+    #091110;
+}
+
+.card--uzcard::after {
+  border-style: dashed;
+  border-color: #9AF2BC;
+  color: #9AF2BC;
+  clip-path: none;
+}
+
+.card--uzum:hover {
+  background: var(--accent);
+  transform: translateY(-4px);
+}
+
+.card--visa:hover {
+  background: var(--accent);
+  transform: translate(-3px, -2px) skewX(-1deg);
+}
+
+.card--uzcard:hover {
+  background: var(--accent);
+  transform: translateY(-3px) scale(1.01);
+}
+
+.card--uzum .card-name,
+.card--uzum .number { color: #66FFF0; }
+
+.card--visa .card-name,
+.card--visa .number { color: #75D9FF; }
+
+.card--uzcard .card-name,
+.card--uzcard .number { color: #9AF2BC; }
+
+.card--uzum:hover::after { animation: nodePulse 1.2s ease-in-out infinite; }
+.card--visa:hover::after { animation: nodeSpin 1.8s linear infinite; }
+.card--uzcard:hover::after { animation: nodeBlink 0.9s steps(2) infinite; }
+
+@keyframes nodePulse {
+  50% { box-shadow: 0 0 18px rgba(85, 245, 229, 0.75); }
+}
+
+@keyframes nodeSpin {
+  50% { transform: translateY(-50%) scale(1.12); background: rgba(117, 217, 255, 0.18); }
+}
+
+@keyframes nodeBlink {
+  50% { opacity: 0.35; }
+}
+
+.card-name {
+  display: block;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.card-info {
+  display: block;
+  color: #6D8985;
+  font-size: 11px;
+  margin-top: 7px;
+}
+
+.number {
+  display: block;
+  color: #55F5E5;
+  margin-top: 17px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* CONTACT SECTION */
+
+.contact-section {
+  margin-top: 32px;
+  display: grid;
+  gap: 12px;
+}
+
+.contact-label {
+  color: #526966;
+  font-size: 9px;
+  letter-spacing: 3px;
+  margin-bottom: 3px;
+}
+
+/* PHONE CONTACT */
+
+.contact-phone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 17px;
+  text-decoration: none;
+  color: #9AF2E8;
+  background: rgba(85, 245, 229, 0.025);
+  border-left: 2px solid #55F5E5;
+  border-bottom: 1px solid rgba(85, 245, 229, 0.2);
+  transition: .25s;
+}
+
+.contact-phone:hover {
+  background: rgba(85, 245, 229, 0.08);
+  padding-left: 22px;
+}
+
+/* TELEGRAM CONTACT */
+
+.contact-telegram {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 17px;
+  text-decoration: none;
+  color: #75D9FF;
+  background: rgba(117, 217, 255, 0.025);
+  border: 1px dashed rgba(117, 217, 255, 0.45);
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+  transition: .25s;
+}
+
+.contact-telegram:hover {
+  background: rgba(117, 217, 255, 0.1);
+  transform: translateX(3px);
+}
+
+.contact-value {
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.contact-meta {
+  display: block;
+  color: #526966;
+  font-size: 8px;
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+
+.contact-arrow {
+  font-size: 17px;
+  opacity: .8;
+}
+
+.contact-phone:focus-visible,
+.contact-telegram:focus-visible {
+  outline: 2px solid #55F5E5;
+  outline-offset: 4px;
+}
+
+.copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 30;
+  min-width: 220px;
+  max-width: calc(100vw - 40px);
+  padding: 12px 16px;
+  transform: translate(-50%, 20px);
+  border: 1px solid rgba(85, 245, 229, 0.38);
+  background: rgba(5, 9, 13, 0.94);
+  color: #55F5E5;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: 220ms ease;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.copy-toast.is-visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  color: #526966;
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 28px 20px;
+  }
+
+  .container {
+    max-width: 420px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  body { align-items: flex-start; padding: 20px 18px 30px; }
+  .frame-border { inset: 7px; }
+  .security-status { font-size: 7px; }
+  .card { margin-bottom: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::after,
+  .frame-border,
+  .contact-phone,
+  .contact-telegram {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="frame-border" aria-hidden="true"></div>
+
+<div class="neon-bg" aria-hidden="true">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+    <g class="fracture">
+      <path d="M-20 118 L92 118 L138 72 L224 72 L270 118 L356 118"/>
+      <path d="M92 118 L72 210 L118 256 L118 342"/>
+      <path d="M224 72 L264 32 L352 32"/>
+      <path d="M270 118 L310 158 L310 244"/>
+      <path d="M138 72 L138 154 L184 200"/>
+
+      <path d="M1062 38 L1120 38 L1164 82 L1248 82 L1292 126"/>
+      <path d="M1164 82 L1164 168 L1210 214"/>
+      <path d="M1248 82 L1328 82 L1372 126 L1470 126"/>
+      <path d="M1292 126 L1292 212 L1340 260 L1340 348"/>
+      <path d="M1210 214 L1292 214"/>
+    </g>
+
+    <g class="fracture">
+      <path d="M-20 650 L66 650 L110 606 L196 606 L242 652 L328 652"/>
+      <path d="M66 650 L66 734 L112 780 L112 870"/>
+      <path d="M196 606 L196 520 L242 474"/>
+      <path d="M242 652 L288 698 L374 698"/>
+
+      <path d="M1110 862 L1196 862 L1242 816 L1328 816 L1374 770 L1460 770"/>
+      <path d="M1196 862 L1196 776 L1242 730"/>
+      <path d="M1328 816 L1328 730 L1374 684"/>
+      <path d="M1242 730 L1330 730 L1374 684 L1458 684"/>
+
+      <path d="M500 18 L500 104 L546 150 L546 236"/>
+      <path d="M546 150 L632 150 L678 196"/>
+      <path d="M814 900 L814 814 L860 768 L860 682"/>
+      <path d="M860 768 L946 768 L992 722"/>
+    </g>
+  </svg>
+</div>
+
+<div class="container">
+
+  <div class="logo">DAMON</div>
+  <div class="subtitle">PERSONAL PAYMENT PORTAL</div>
+
+  <div class="security-status" aria-label="Session status">
+    <span>SESSION // <b>ACTIVE</b></span>
+    <span>NODE // LOCAL</span>
+  </div>
+
+  <div class="line"></div>
+
+  <h1>Send money</h1>
+
+  <p class="description">
+    Choose your preferred payment method.
+    Simple. Secure. Direct.
+  </p>
+
+  <!-- UZUM BANK -->
+  <button
+    class="card card--uzum"
+    type="button"
+    data-node="01"
+    aria-label="UZUM BANK, UZUM CARD"
+    onclick="copyCard('', 'UZUM BANK')"
+  >
+    <span class="card-name">UZUM BANK</span>
+    <span class="card-info">UZUM CARD</span>
+    <span class="number">Copy card number ↗</span>
+  </button>
+
+  <!-- VISA -->
+  <button
+    class="card card--visa"
+    type="button"
+    data-node="02"
+    aria-label="VISA, HAMKORBANK TEZ VISA"
+    onclick="copyCard('', 'VISA')"
+  >
+    <span class="card-name">VISA</span>
+    <span class="card-info">HAMKORBANK · TEZ VISA</span>
+    <span class="number">Copy card number ↗</span>
+  </button>
+
+  <!-- UZCARD -->
+  <button
+    class="card card--uzcard"
+    type="button"
+    data-node="03"
+    aria-label="UZCARD, HAMKORBANK"
+    onclick="copyCard('', 'UZCARD')"
+  >
+    <span class="card-name">UZCARD</span>
+    <span class="card-info">HAMKORBANK</span>
+    <span class="number">Copy card number ↗</span>
+  </button>
+
+  <!-- CONTACTS -->
+
+  <div class="contact-section">
+
+    <div class="contact-label">DIRECT CONTACT // 01</div>
+
+    <!-- PHONE -->
+    <a
+      class="contact-phone"
+      href="#"
+      aria-label="Phone number hidden for publication"
+    >
+      <div>
+        <span class="contact-meta">PHONE CONNECTION</span>
+        <span class="contact-value">PRIVATE // AVAILABLE ON REQUEST</span>
+      </div>
+      <span class="contact-arrow">↗</span>
+    </a>
+
+    <!-- TELEGRAM -->
+    <a
+      class="contact-telegram"
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Open Telegram profile"
+    >
+      <div>
+        <span class="contact-meta">TELEGRAM CONNECTION</span>
+        <span class="contact-value">PRIVATE // AVAILABLE ON REQUEST</span>
+      </div>
+      <span class="contact-arrow">↗</span>
+    </a>
+
+  </div>
+
+  <div class="footer">DAMON. © 2026</div>
+
+</div>
+
+<div class="copy-toast" id="copyToast" role="status" aria-live="polite"></div>
+
+<script>
+let toastTimer;
+
+function showToast(message) {
+  const toast = document.getElementById("copyToast");
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+}
+
+function copyText(text, label) {
+  if (!navigator.clipboard) {
+    showToast("COPY UNAVAILABLE // SECURE CONNECTION REQUIRED");
+    return;
+  }
+
+  navigator.clipboard.writeText(text)
+    .then(() => showToast(label + " COPIED // SECURE"))
+    .catch(() => showToast("COPY FAILED // TRY AGAIN"));
+}
+
+function copyCard(number, provider) {
+  if (!number) {
+    showToast(provider + " // CARD DATA PENDING");
+    return;
+  }
+
+  if (!navigator.clipboard) {
+    showToast("COPY UNAVAILABLE // SECURE CONNECTION REQUIRED");
+    return;
+  }
+
+  navigator.clipboard.writeText(number)
+    .then(() => showToast("CARD NUMBER COPIED // SECURE"))
+    .catch(() => showToast("COPY FAILED // TRY AGAIN"));
+}
+</script>
+
+</body>
+</html>
