@@ -1,8 +1,9 @@
 # macOS
 .DS_Store
+.CFUserTextEncoding
 .Trash/
 
-# Editor and local session data
+# Editor and local/session data
 .vscode/
 .vscode-shared/
 .copilot/
@@ -30,6 +31,8 @@
 
 # macOS personal/system folders
 Applications/
+.homebrew/
+vscods
 Desktop/
 Documents/
 Downloads/

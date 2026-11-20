@@ -616,7 +616,7 @@ h1::before {
     type="button"
     data-node="01"
     aria-label="UZUM BANK, UZUM CARD"
-    onclick="copyCard('', 'UZUM BANK')"
+    onclick="copyCard('4916990339311976', 'UZUM BANK')"
   >
     <span class="card-name">UZUM BANK</span>
     <span class="card-info">UZUM CARD</span>
@@ -629,7 +629,7 @@ h1::before {
     type="button"
     data-node="02"
     aria-label="VISA, HAMKORBANK TEZ VISA"
-    onclick="copyCard('', 'VISA')"
+    onclick="copyCard('4413597614901815', 'VISA')"
   >
     <span class="card-name">VISA</span>
     <span class="card-info">HAMKORBANK · TEZ VISA</span>
@@ -642,7 +642,7 @@ h1::before {
     type="button"
     data-node="03"
     aria-label="UZCARD, HAMKORBANK"
-    onclick="copyCard('', 'UZCARD')"
+    onclick="copyCard('5614681816040756', 'UZCARD')"
   >
     <span class="card-name">UZCARD</span>
     <span class="card-info">HAMKORBANK</span>
@@ -658,12 +658,13 @@ h1::before {
     <!-- PHONE -->
     <a
       class="contact-phone"
-      href="#"
-      aria-label="Phone number hidden for publication"
+      href="tel:+998939013272"
+      onclick="copyText('+998939013272', 'PHONE NUMBER')"
+      aria-label="Call or copy phone number"
     >
       <div>
         <span class="contact-meta">PHONE CONNECTION</span>
-        <span class="contact-value">PRIVATE // AVAILABLE ON REQUEST</span>
+        <span class="contact-value">+998 93 901 32 72</span>
       </div>
       <span class="contact-arrow">↗</span>
     </a>
@@ -671,14 +672,14 @@ h1::before {
     <!-- TELEGRAM -->
     <a
       class="contact-telegram"
-      href="#"
+      href="https://t.me/the_spcone"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Open Telegram profile"
     >
       <div>
         <span class="contact-meta">TELEGRAM CONNECTION</span>
-        <span class="contact-value">PRIVATE // AVAILABLE ON REQUEST</span>
+        <span class="contact-value">@the_spcone</span>
       </div>
       <span class="contact-arrow">↗</span>
     </a>
@@ -714,10 +715,6 @@ function copyText(text, label) {
 }
 
 function copyCard(number, provider) {
-  if (!number) {
-    showToast(provider + " // CARD DATA PENDING");
-    return;
-  }
 
   if (!navigator.clipboard) {
     showToast("COPY UNAVAILABLE // SECURE CONNECTION REQUIRED");
